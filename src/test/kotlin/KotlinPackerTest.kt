@@ -4,6 +4,7 @@ import cchcc.kt.packer.XorPacker
 import org.junit.Assert
 import org.junit.Test
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 class KotlinPackerTest {
 
@@ -35,5 +36,37 @@ class KotlinPackerTest {
         XorPacker(ByteArray(16).apply { random.nextBytes(this) }
                 , ByteArray(16).apply { random.nextBytes(this) })
             .let { packAndUnpack(it) }
+    }
+
+
+    fun checkPerformance(packer: Packer) = with(packer) {
+        val src = ByteArray(1024 * 1024).apply { random.nextBytes(this) }
+
+        // warm up memory
+        pack(src)
+        unpack(src)
+        unpack(pack(src))
+        unpack(pack(src))
+        unpack(pack(src))
+
+
+        val spentTime_ms = measureTimeMillis {
+            (1..100).forEach { unpack(pack(src)) }
+        }
+        println("${javaClass.name} - pack and unpack 100MB : $spentTime_ms milliseconds")
+    }
+
+    @Test
+    fun aes_performance() {
+        AesPacker(ByteArray(16).apply { random.nextBytes(this) }
+                , ByteArray(16).apply { random.nextBytes(this) })
+                .let { checkPerformance(it) }
+    }
+
+    @Test
+    fun xor_performance() {
+        XorPacker(ByteArray(16).apply { random.nextBytes(this) }
+                , ByteArray(16).apply { random.nextBytes(this) })
+                .let { checkPerformance(it) }
     }
 }

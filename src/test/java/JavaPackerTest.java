@@ -22,7 +22,7 @@ public class JavaPackerTest {
 
     @Test
     public void aes_packAndUnpack() throws InvalidAlgorithmParameterException, InvalidKeyException {
-        byte key[] = new byte[16], iv[] = new byte[16];;
+        byte key[] = new byte[16], iv[] = new byte[16];
         random.nextBytes(key);
         random.nextBytes(iv);
 
@@ -38,4 +38,43 @@ public class JavaPackerTest {
         packAndUnpack(new XorPacker(key, iv));
     }
 
+
+    void checkPerformance(Packer packer) {
+        byte[] src = new byte[1024 * 1024];
+        random.nextBytes(src);
+
+        // warm up memory
+        packer.pack(src);
+        packer.unpack(src);
+        packer.unpack(packer.pack(src));
+        packer.unpack(packer.pack(src));
+        packer.unpack(packer.pack(src));
+
+        long start = System.currentTimeMillis();
+        for(int i = 0; i< 100; i++)
+            packer.unpack(packer.pack(src));
+
+        long spentTime = System.currentTimeMillis() - start;
+
+        System.out.println(String.format("%s - pack and unpack of 100MB : %d milliseconds"
+                           , packer.getClass().getName(), spentTime));
+    }
+
+    @Test
+    public void aes_performance() throws InvalidAlgorithmParameterException, InvalidKeyException {
+        byte key[] = new byte[16], iv[] = new byte[16];
+        random.nextBytes(key);
+        random.nextBytes(iv);
+
+        checkPerformance(new AesPacker(key, iv));
+    }
+
+    @Test
+    public void xor_performance() {
+        byte key[] = new byte[16], iv[] = new byte[16];
+        random.nextBytes(key);
+        random.nextBytes(iv);
+
+        checkPerformance(new XorPacker(key, iv));
+    }
 }
