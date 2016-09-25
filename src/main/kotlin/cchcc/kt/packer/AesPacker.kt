@@ -54,7 +54,11 @@ class AesPacker(key: ByteArray, iv: ByteArray) : Packer {
         val encrypted = ByteArray(src.size - hash.size)
         System.arraycopy(src, hash.size, encrypted, 0, encrypted.size)
 
-        val decrypted = cipherDec.doFinal(encrypted)
+        val decrypted = try {
+            cipherDec.doFinal(encrypted)
+        } catch (e: Exception) {
+            return null
+        }
 
         try {
             for (i in hash.indices) {
