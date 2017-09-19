@@ -13,7 +13,7 @@ interface Packer {
     /**
      * @return if unpacking is failed returns null
      */
-    fun unpackToString(src: ByteArray): String? = unpack(src)?.let { String(it) } ?: null
+    fun unpackToString(src: ByteArray): String? = unpack(src)?.let { String(it) }
 }
 
 fun ByteArray.pack(packer: (ByteArray) -> ByteArray): ByteArray = packer.invoke(this)
