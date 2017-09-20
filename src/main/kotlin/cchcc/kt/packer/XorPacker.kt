@@ -16,7 +16,7 @@ class XorPacker @JvmOverloads constructor(private val seedkey: ByteArray
         var pos = 0
         while (pos < src.size) {
             for (k in key) {
-                result[pos] = (src[pos++] xor k).toByte()
+                result[pos] = src[pos++] xor k
                 if (pos >= src.size)
                     break
             }
@@ -46,14 +46,14 @@ class XorPacker @JvmOverloads constructor(private val seedkey: ByteArray
         val key = generateKey(dynamicKey)
 
         val encrypted = encrypt(key, src)
-        val result = ByteArray(padding.size + 1 + dynamicKey.size + 1 + verification.size + encrypted.size + dummySize.toInt())
+        val result = ByteArray(padding.size + 1 + dynamicKey.size + 1 + verification.size + encrypted.size + dummySize)
         System.arraycopy(padding, 0, result, 0, padding.size)
         result[padding.size] = dynamicKeySize.toByte()
         System.arraycopy(dynamicKey, 0, result, padding.size + 1, dynamicKey.size)
         result[padding.size + 1 + dynamicKey.size] = dummySize.toByte()
 
-        result[padding.size] = (result[padding.size] xor result[0]).toByte()
-        result[padding.size + 1 + dynamicKey.size] = (result[padding.size + 1 + dynamicKey.size] xor result[1]).toByte()
+        result[padding.size] = (result[padding.size] xor result[0])
+        result[padding.size + 1 + dynamicKey.size] = (result[padding.size + 1 + dynamicKey.size] xor result[1])
 
         for (pos in verification.indices)
             result[padding.size + 1 + dynamicKey.size + 1 + pos] = src[Math.abs(verification[pos] % src.size)]
@@ -72,34 +72,32 @@ class XorPacker @JvmOverloads constructor(private val seedkey: ByteArray
             dynamicKeySize = (dynamicKeySize.toByte() xor src[0]).toInt()
             if (dynamicKeySize < 0)
                 return null
+
             val dynamicKey = ByteArray(dynamicKeySize)
 
-            System.arraycopy(src, maxPaddingSize + 1, dynamicKey, 0, dynamicKeySize.toInt())
+            System.arraycopy(src, maxPaddingSize + 1, dynamicKey, 0, dynamicKeySize)
 
-            var dummySize = src[maxPaddingSize + 1 + dynamicKeySize.toInt()]
+            var dummySize = src[maxPaddingSize + 1 + dynamicKeySize]
 
-            dummySize = (dummySize xor src[1]).toByte()
+            dummySize = dummySize xor src[1]
             if (dummySize < 0)
                 return null
 
             val vf = ByteArray(verification.size)
-            System.arraycopy(src, maxPaddingSize + 1 + dynamicKeySize.toInt() + 1, vf, 0, verification.size)
+            System.arraycopy(src, maxPaddingSize + 1 + dynamicKeySize + 1, vf, 0, verification.size)
 
-            val encryptedSize = src.size - (maxPaddingSize + 1 + dynamicKeySize.toInt() + 1 + verification.size + dummySize.toInt())
+            val encryptedSize = src.size - (maxPaddingSize + 1 + dynamicKeySize + 1 + verification.size + dummySize.toInt())
             if (encryptedSize < 0)
                 return null
 
             val encrypted = ByteArray(encryptedSize)
-            System.arraycopy(src, maxPaddingSize + 1 + dynamicKeySize.toInt() + 1 + verification.size, encrypted, 0, encrypted.size)
+            System.arraycopy(src, maxPaddingSize + 1 + dynamicKeySize + 1 + verification.size, encrypted, 0, encrypted.size)
 
             val key = generateKey(dynamicKey)
+
             val decrypted = encrypt(key, encrypted)
 
-            for (pos in verification.indices)
-                if (vf[pos] != decrypted[Math.abs(verification[pos] % decrypted.size)])
-                    return null
-
-            return decrypted
+            return if (verification.indices.any { vf[it] != decrypted[Math.abs(verification[it] % decrypted.size)] }) null else decrypted
         } catch (e: ArrayIndexOutOfBoundsException) {
             return null
         }

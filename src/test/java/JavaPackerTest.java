@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.util.Arrays;
 import java.util.Random;
 
 public class JavaPackerTest {
@@ -76,5 +77,14 @@ public class JavaPackerTest {
         random.nextBytes(iv);
 
         checkPerformance(new XorPacker(key, iv));
+    }
+
+    @Test
+    public void xor_test() {
+        byte key[] = new byte[]{-20, -107, -120, -21, -123, -107, -19, -107, -104, -20, -117, -92, -22, -80, -128, 32, -29, -123, -117, -29, -123, -117, -29, -123, -117, 32, 97, 106, 105, 101};
+        byte v[] = new byte[]{-49, -80, 0, -1, 5, -53, -116, 35, -94, 92, 77, -107, -74, 30, -74, -83, 52};
+
+        XorPacker packer = new XorPacker(key, v);
+        System.out.println(Arrays.toString(packer.pack("bas꿻ㄱㄴㄷ😗฿")));
     }
 }

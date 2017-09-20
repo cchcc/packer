@@ -1,0 +1,31 @@
+{
+  "name": "packer",
+  "version": "1.0.0",
+  "description": "Simple. It packs or unpacks bytes or string for interacting between server and client or peer to peer. It encrypts and verifies serialized data.   Useful at making request/response body for HTTP, packet for TCP/UDP.",
+  "main": "dist/packer.js",
+  "module": "src/js/packer.js",
+  "scripts": {
+    "test": "node dist/test/test.js",
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cchcc/packer.git"
+  },
+  "author": "cchcc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cchcc/packer/issues"
+  },
+  "homepage": "https://github.com/cchcc/packer#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "lodash": "^4.17.4",
+    "webpack": "^3.6.0"
+  },
+  "dependencies": {
+    "text-encoding": "^0.6.4"
+  }
+}
