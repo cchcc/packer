@@ -1,4 +1,5 @@
 const path = require('path');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -10,6 +11,9 @@ module.exports = {
         library: 'packer',
         libraryTarget: 'umd'
     },
+    plugins: [
+        new UglifyJSPlugin()
+    ],
     externals: {
         lodash: {
             commonjs: 'lodash',
